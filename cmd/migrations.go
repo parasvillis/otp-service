@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"log"
-	"otp_service/internal/db"
+	"otp_service/config/db"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"

@@ -2,9 +2,9 @@ package delivery
 
 import (
 	"fmt"
-	"otp_service/services/contracts"
-	"otp_service/services/delivery/email"
-	"otp_service/services/delivery/sms"
+	"otp_service/internal/services/contracts"
+	"otp_service/internal/services/delivery/email"
+	"otp_service/internal/services/delivery/sms"
 )
 
 // type OtpSender interface {

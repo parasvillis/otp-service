@@ -2,7 +2,7 @@ package otpRepo
 
 import (
 	"context"
-	"otp_service/internal/db"
+	"otp_service/config/db"
 
 	"go.uber.org/zap"
 )

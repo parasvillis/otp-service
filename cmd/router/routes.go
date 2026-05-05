@@ -1,7 +1,7 @@
 package router
 
 import (
-	"otp_service/handlers"
+	"otp_service/internal/handlers"
 
 	"github.com/go-chi/chi"
 )

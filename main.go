@@ -8,14 +8,14 @@ import (
 
 	"otp_service/cmd"
 	"otp_service/cmd/router"
-	"otp_service/handlers"
-	"otp_service/internal/db"
-	"otp_service/internal/redisclient"
-	"otp_service/repos"
-	"otp_service/repos/otpRepo"
-	"otp_service/services/contracts"
-	"otp_service/services/delivery"
-	otpservice "otp_service/services/otpService"
+	"otp_service/config/db"
+	"otp_service/config/redisclient"
+	"otp_service/internal/handlers"
+	"otp_service/internal/repos"
+	"otp_service/internal/repos/otpRepo"
+	"otp_service/internal/services/contracts"
+	"otp_service/internal/services/delivery"
+	otpservice "otp_service/internal/services/otpService"
 
 	"go.uber.org/zap"
 )

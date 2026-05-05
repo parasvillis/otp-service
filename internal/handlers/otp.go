@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"otp_service/constants"
 	"otp_service/dto"
-	otpservice "otp_service/services/otpService"
+	otpservice "otp_service/internal/services/otpService"
 	"otp_service/utils"
 )
 
