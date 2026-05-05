@@ -3,6 +3,8 @@ package otpRepo
 import (
 	"context"
 	"otp_service/internal/db"
+
+	"go.uber.org/zap"
 )
 
 type OtpTemplate interface {
@@ -10,11 +12,12 @@ type OtpTemplate interface {
 }
 
 type otpTemplates struct {
-	db db.DB
+	db     db.DB
+	logger *zap.Logger
 }
 
-func NewOtpTemplatesRepo(db db.DB) OtpTemplate {
-	return &otpTemplates{db: db}
+func NewOtpTemplatesRepo(db db.DB, logger *zap.Logger) OtpTemplate {
+	return &otpTemplates{db: db, logger: logger}
 }
 
 func (o *otpTemplates) GetOtpTemplates(ctx context.Context, clientID, templateName string) ([]OtpTemplateModel, error) {
@@ -25,6 +28,7 @@ func (o *otpTemplates) GetOtpTemplates(ctx context.Context, clientID, templateNa
 	var templates []OtpTemplateModel
 	err := o.db.SelectContext(ctx, &templates, query, clientID, templateName)
 	if err != nil {
+		o.logger.Error("Error occurred while fetching OTP templates", zap.Error(err))
 		return nil, err
 	}
 	return templates, nil

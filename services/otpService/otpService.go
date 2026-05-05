@@ -8,7 +8,7 @@ import (
 	"otp_service/dto"
 	"otp_service/repos"
 	"otp_service/repos/otpRepo"
-	"otp_service/services/delivery"
+	"otp_service/services/contracts"
 	"otp_service/services/helpers"
 	"otp_service/utils"
 	"strconv"
@@ -29,10 +29,10 @@ type otpService struct {
 	otpConfigRepo   otpRepo.OTPConfigs
 	otpTemplateRepo otpRepo.OtpTemplate
 	otpEventRepo    otpRepo.OtpEvent
-	senderFactory   *delivery.SenderFactory
+	senderFactory   contracts.SenderFactory
 }
 
-func NewOptService(c repos.Cache, otpConfigRepo otpRepo.OTPConfigs, otpTemplateRepo otpRepo.OtpTemplate, otpEventRepo otpRepo.OtpEvent, senderFactory *delivery.SenderFactory) OTPService {
+func NewOptService(c repos.Cache, otpConfigRepo otpRepo.OTPConfigs, otpTemplateRepo otpRepo.OtpTemplate, otpEventRepo otpRepo.OtpEvent, senderFactory contracts.SenderFactory) OTPService {
 	return &otpService{cache: c, otpConfigRepo: otpConfigRepo, otpTemplateRepo: otpTemplateRepo, otpEventRepo: otpEventRepo, senderFactory: senderFactory}
 }
 
@@ -324,41 +324,32 @@ func (o *otpService) sendOTP(ctx context.Context, otp string, response *dto.Gene
 			OTPType:          otpConfig.OtpType,
 			EmailSubject:     tpl.EmailSubject,
 		}
-
-		go func(s delivery.OtpSender, sendReq dto.SendOTPRequest, tpl otpRepo.OtpTemplateModel) {
-			sendCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		detachedCtx := context.WithoutCancel(ctx)
+		go func(s contracts.OtpSender, sendReq dto.SendOTPRequest, tModel otpRepo.OtpTemplateModel) {
+			sendCtx, cancel := context.WithTimeout(detachedCtx, 5*time.Second)
 			defer cancel()
+			status := constants.StatusSuccess
+			var errStr *string
+
 			if err := s.Send(sendCtx, sendReq); err != nil {
-				o.logOTPEvent(ctx, dto.OTPEventParams{
-					ClientID:      otpConfig.ClientID,
-					UserID:        userID,
-					OtpType:       otpConfig.OtpType,
-					Identifier:    "1234567890",
-					Channel:       tpl.Channel,
-					EventType:     constants.EventSent,
-					Status:        constants.StatusFailure,
-					AttemptNumber: 0,
-					ResendNumber:  0,
-					Vendor:        tpl.Vendor,
-					Error:         utils.StringPtr(err.Error()),
-					Otp:           &otp,
-					SubmittedOtp:  nil,
-					IPAddress:     ipAddress,
-					UserAgent:     userAgent,
-				})
-				log.Printf("failed to send OTP via %s: %v", tpl.Channel, err)
+				log.Printf("failed to send OTP via %s: %v", tModel.Channel, err)
+				status = constants.StatusFailure
+				e := err.Error()
+				errStr = &e
 			}
-			o.logOTPEvent(ctx, dto.OTPEventParams{
+
+			o.logOTPEvent(detachedCtx, dto.OTPEventParams{
 				ClientID:      otpConfig.ClientID,
 				UserID:        userID,
 				OtpType:       otpConfig.OtpType,
 				Identifier:    "1234567890",
-				Channel:       tpl.Channel,
+				Channel:       tModel.Channel,
 				EventType:     constants.EventSent,
-				Status:        constants.StatusSuccess,
+				Status:        status,
 				AttemptNumber: 0,
 				ResendNumber:  0,
-				Vendor:        tpl.Vendor,
+				Vendor:        tModel.Vendor,
+				Error:         errStr,
 				Otp:           &otp,
 				SubmittedOtp:  nil,
 				IPAddress:     ipAddress,
@@ -388,9 +379,8 @@ func (o *otpService) logOTPEvent(ctx context.Context, params dto.OTPEventParams)
 		IPAddress:     params.IPAddress,
 		UserAgent:     params.UserAgent,
 	}
-
+	detachedCtx := context.WithoutCancel(ctx)
 	go func() {
-		detachedCtx := context.WithoutCancel(ctx)
 		logCtx, cancel := context.WithTimeout(detachedCtx, 5*time.Second)
 		defer cancel()
 

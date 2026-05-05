@@ -1,24 +1,23 @@
 package delivery
 
 import (
-	"context"
 	"fmt"
-	"otp_service/dto"
+	"otp_service/services/contracts"
 	"otp_service/services/delivery/email"
 	"otp_service/services/delivery/sms"
 )
 
-type OtpSender interface {
-	Send(ctx context.Context, req dto.SendOTPRequest) error
-}
+// type OtpSender interface {
+// 	Send(ctx context.Context, req dto.SendOTPRequest) error
+// }
 
 type SenderFactory struct {
-	msg91Sender    OtpSender
-	twilioSender   OtpSender
-	sendGridSender OtpSender
+	msg91Sender    contracts.OtpSender
+	twilioSender   contracts.OtpSender
+	sendGridSender contracts.OtpSender
 }
 
-func NewSenderFactory() *SenderFactory {
+func NewSenderFactory() contracts.SenderFactory {
 	return &SenderFactory{
 		msg91Sender:    &sms.Msg91Sender{},
 		twilioSender:   &sms.TwilioSender{},
@@ -26,7 +25,7 @@ func NewSenderFactory() *SenderFactory {
 	}
 }
 
-func (f *SenderFactory) GetSender(channel, vendor string) (OtpSender, error) {
+func (f *SenderFactory) GetSender(channel, vendor string) (contracts.OtpSender, error) {
 	switch channel {
 	case "sms":
 		switch vendor {

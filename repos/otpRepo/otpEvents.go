@@ -3,6 +3,8 @@ package otpRepo
 import (
 	"context"
 	"otp_service/internal/db"
+
+	"go.uber.org/zap"
 )
 
 type OtpEvent interface {
@@ -10,11 +12,12 @@ type OtpEvent interface {
 }
 
 type otpEvent struct {
-	db db.DB
+	db     db.DB
+	logger *zap.Logger
 }
 
-func NewOtpEventRepo(db db.DB) OtpEvent {
-	return &otpEvent{db: db}
+func NewOtpEventRepo(db db.DB, logger *zap.Logger) OtpEvent {
+	return &otpEvent{db: db, logger: logger}
 }
 
 func (o *otpEvent) RegisterOtpEvent(ctx context.Context, event OtpEventModel) error {

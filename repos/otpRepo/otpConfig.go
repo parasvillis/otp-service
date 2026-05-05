@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"otp_service/internal/db"
+
+	"go.uber.org/zap"
 )
 
 // interface
@@ -17,11 +19,12 @@ type OTPConfigs interface {
 }
 
 type otpConfig struct {
-	db db.DB
+	db     db.DB
+	logger *zap.Logger
 }
 
-func NewOTPConfigsRepo(db db.DB) OTPConfigs {
-	return &otpConfig{db: db}
+func NewOTPConfigsRepo(db db.DB, logger *zap.Logger) OTPConfigs {
+	return &otpConfig{db: db, logger: logger}
 }
 
 func (o *otpConfig) GetOTPConfig(ctx context.Context, clientID, otpType string) (*OtpConfigModel, error) {
@@ -35,6 +38,7 @@ func (o *otpConfig) GetOTPConfig(ctx context.Context, clientID, otpType string) 
 	var OtpConfig OtpConfigModel
 	err := o.db.GetContext(ctx, &OtpConfig, query, clientID, otpType)
 	if err != nil {
+		o.logger.Error("Error occurred while fetching OTP config", zap.Error(err))
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("no OTP config found for client_id: %s and otp_type: %s", clientID, otpType)
 		}
