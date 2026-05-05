@@ -25,11 +25,22 @@ CREATE TABLE IF NOT EXISTS otp_configs (
     UNIQUE (client_id, otp_type, channel)
 );
 
+ALTER TABLE otp_configs DROP CONSTRAINT IF EXISTS otp_configs_client_id_otp_type_channel_key;
+
+ALTER TABLE otp_configs
+DROP COLUMN channel;
+
+ALTER TABLE otp_configs
+DROP COLUMN vendor;
+
+ALTER TABLE otp_configs DROP COLUMN template_id;
+
+ALTER TABLE otp_configs ADD COLUMN template_name VARCHAR(50);
 
 -- sample queries to insert data into otp_configs table
 INSERT INTO otp_configs (client_id, otp_type, reuse_otp_on_resend, otp_length, expiry_seconds, max_verify_attempts, 
 resend_allowed, max_resend_attempts, cooldown_seconds, template_name) VALUES 
-('550e8400-e29b-41d4-a716-446655440000', 'login', TRUE, 6, 300, 3, TRUE, 2, 60, 'login_otp') ON CONFLICT DO NOTHING;
+('550e8400-e29b-41d4-a716-446655440000', 'login', TRUE, 6, 300, 3, TRUE, 2, 10, 'login_otp') ON CONFLICT DO NOTHING;
 
 INSERT INTO otp_configs (client_id, otp_type, reuse_otp_on_resend, otp_length, expiry_seconds, max_verify_attempts, 
 resend_allowed, max_resend_attempts, cooldown_seconds, template_name) VALUES 
