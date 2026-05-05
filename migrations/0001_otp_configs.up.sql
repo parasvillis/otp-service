@@ -27,23 +27,17 @@ CREATE TABLE IF NOT EXISTS otp_configs (
 
 
 -- sample queries to insert data into otp_configs table
--- INSERT INTO otp_configs (
---     client_id, otp_type, channel, reuse_otp_on_resend, template_id, otp_length, expiry_seconds, max_verify_attempts, resend_allowed, max_resend_attempts, cooldown_seconds, vendor
--- ) VALUES (
---     '550e8400-e29b-41d4-a716-446655440000', 'login', 'sms', TRUE, '660e8400-e29b-41d4-a716-446655440001', 6, 300, 3, TRUE, 2, NULL, 'msg91'
--- ) On CONFLICT (client_id, otp_type, channel) DO NOTHING;
+INSERT INTO otp_configs (client_id, otp_type, reuse_otp_on_resend, otp_length, expiry_seconds, max_verify_attempts, 
+resend_allowed, max_resend_attempts, cooldown_seconds, template_name) VALUES 
+('550e8400-e29b-41d4-a716-446655440000', 'login', TRUE, 6, 300, 3, TRUE, 2, 60, 'login_otp') ON CONFLICT DO NOTHING;
 
--- INSERT INTO otp_configs (
---     client_id, otp_type, channel, reuse_otp_on_resend, template_id, otp_length, expiry_seconds, max_verify_attempts, resend_allowed, max_resend_attempts, cooldown_seconds, vendor
--- ) VALUES (
---     '550e8400-e29b-41d4-a716-446655440000', 'signup', 'email', FALSE, '660e8400-e29b-41d4-a716-446655440002', 4, 600, 5, TRUE, 3, NULL, 'twilio'
--- ) On CONFLICT (client_id, otp_type, channel) DO NOTHING;
+INSERT INTO otp_configs (client_id, otp_type, reuse_otp_on_resend, otp_length, expiry_seconds, max_verify_attempts, 
+resend_allowed, max_resend_attempts, cooldown_seconds, template_name) VALUES 
+('550e8400-e29b-41d4-a716-446655440000', 'signup', FALSE, 4, 600, 5, TRUE, 3, NULL, 'signup_otp') ON CONFLICT DO NOTHING;
 
+INSERT INTO otp_configs (client_id, otp_type, reuse_otp_on_resend, otp_length, expiry_seconds, max_verify_attempts, 
+resend_allowed, max_resend_attempts, cooldown_seconds, template_name) VALUES 
+('770e8400-e29b-41d4-a716-446655440003', 'transaction', TRUE, 4, 200, 2, FALSE, 0, NULL, 'transaction_otp') ON CONFLICT DO NOTHING;
 
--- INSERT INTO otp_configs (
---     client_id, otp_type, channel, reuse_otp_on_resend, template_id, otp_length, expiry_seconds, max_verify_attempts, resend_allowed, max_resend_attempts, cooldown_seconds, vendor
--- ) VALUES (
---     '770e8400-e29b-41d4-a716-446655440003', 'transaction', 'whatsapp', TRUE, '660e8400-e29b-41d4-a716-446655440002', 4, 200, 2, FALSE, NULL, NULL, 'msg91'
--- ) On CONFLICT (client_id, otp_type, channel) DO NOTHING;
 
 

@@ -6,7 +6,7 @@ services:
       - "8080:8080"
     environment:
       - REDIS_ADDR=redis:6379
-      - REDIS_PASSWORKD=""
+      - REDIS_PASSWORD=""
       - DB_HOST=db
       - DB_PORT=${POSTGRES_PORT}
       - DB_USER=${POSTGRES_USER}

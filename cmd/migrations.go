@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"log"
@@ -12,8 +12,8 @@ import (
 func RunMigrations(dbURL string) {
 	db.WaitForDB(dbURL)
 	m, err := migrate.New(
-		// "file:///Users/parasvillis/machine_coding/otp_service/migrations",
-		"file:///migrations",
+		"file://./migrations",
+		// "file:///migrations",
 		dbURL,
 	)
 	if err != nil {
