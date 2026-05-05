@@ -1,0 +1,46 @@
+Functional---------------
+
+OTP type? (login, transaction, 2FA) - yes
+Validity duration? - variable/dynamic
+Max attempts? - variable/dynamic
+Resend allowed? - variable/dynamic
+Resent attemts 
+One active OTP per user? - yes/invalidate prev once new is generated
+
+source -> phone [extensible to email and other]
+
+Hashing ? -> can do later
+multi tenant ? -> can do later
+
+Non-Functional ------------------
+
+Expected QPS?
+Multi-region?
+SLA?
+Fraud risk level?
+Regulatory requirements?
+
+observability ? -> can do later
+
+
+
+-------------------- Solution --------------------
+
+config -> otp management -> track all functional requirements
+
+storage - redis [for now  internal map / postgres]
+tables -> 
+ - users[user_id, name]
+ - otp [user_id, source, source_identifier, otp, otp_type, Validity/expiry, attempt_count, verified_at, expires_at, created_at]
+//source_identifier is actual phone number and actual email
+
+enum -> 
+----------
+status -> 
+1 -> generated/active
+2 -> verified
+3 -> expired
+------------
+
+source -> [phone] // should be extensible
+

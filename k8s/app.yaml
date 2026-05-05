@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  namespace: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+
+      # initContainers:
+      #   - name: migrate
+      #     image: parasvillis/otp-service:v1.0.3
+      #     env:
+      #       - name: DB_USER
+      #         valueFrom:
+      #           secretKeyRef:
+      #             name: app-secret
+      #             key: POSTGRES_USER
+      #       - name: DB_PASSWORD
+      #         valueFrom:
+      #           secretKeyRef:
+      #             name: app-secret
+      #             key: POSTGRES_PASSWORD
+      #       - name: DB_NAME
+      #         valueFrom:
+      #           secretKeyRef:
+      #             name: app-secret
+      #             key: POSTGRES_DB
+      #       - name: DB_HOST
+      #         value: db
+      #       - name: DB_PORT
+      #         value: "5432"
+      #     command: ["/migrate"]
+      #     args:
+      #       - "-path"
+      #       - "/migrations"
+      #       - "-database"
+      #       - "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
+      #       - "up"
+
+      containers:
+        - name: app
+          image: parasvillis/otp-service:v2.0.4
+          ports:
+            - containerPort: 8080
+
+          envFrom:
+            - configMapRef:
+                name: app-config
+
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: POSTGRES_USER
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: POSTGRES_PASSWORD
+
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: POSTGRES_DB
+            
+            - name: DB_HOST
+              value: db
+
+            - name: DB_POR T
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: POSTGRES_PORT
+
+            - name: DB_SSLMODE
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: POSTGRES_SSLMODE
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  namespace: my-app
+spec:
+  type: NodePort
+  selector:
+    app: app
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30007
